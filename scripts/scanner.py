@@ -27,19 +27,17 @@ def image_to_excel(image_file_name, output_columns=None, output_dir=OUTPUT_DIR):
         key: value for key, value in [line.split(":") for line in osd.split("\n")[:-1]]
     }
     rotation_angle = float(osd_dict["Rotate"])
-    pdf_path = os.path.join(OUTPUT_DIR, image_file_name.split(".")[0] + ".pdf")
-    with open(pdf_path, "wb") as f:
+    pdf_image = tempfile.NamedTemporaryFile(delete=False)
+    with open(pdf_image.name, "wb") as f:
         f.write(pdf_bytes)
     print("Pre processing...")
-    with open(pdf_path, "rb") as f:
+    with open(pdf_image.name, "rb") as f:
         pdf = pypdf.PdfReader(f)
         if rotation_angle != 0.0:
-            rotated_pdf_path = os.path.join(
-                OUTPUT_DIR, "rotated" + image_file_name.split(".")[0] + ".pdf"
-            )
+            rotated_pdf_image = tempfile.NamedTemporaryFile(delete=False)
             for page in pdf.pages:
                 page.rotate(rotation_angle)
-                with open(rotated_pdf_path, "wb") as rotated_f:
+                with open(rotated_pdf_image.name, "wb") as rotated_f:
                     pdf_writer = pypdf.PdfWriter()
                     for page in pdf.pages:
                         pdf_writer.add_page(page)
@@ -49,8 +47,6 @@ def image_to_excel(image_file_name, output_columns=None, output_dir=OUTPUT_DIR):
             tables = tabula.read_pdf(rotated_f, pages="all", lattice=True)
         except:
             tables = tabula.read_pdf(f, pages="all", lattice=True)
-    os.remove(pdf_path)
-    os.remove(rotated_pdf_path)
     if not tables:
         print(f"No tables found in {image_file_name}.")
     else:
