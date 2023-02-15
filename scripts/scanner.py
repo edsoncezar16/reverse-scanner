@@ -4,7 +4,6 @@ import pytesseract
 import os
 import tabula
 import pypdf
-import tempfile
 
 INPUT_DIR = "input_images"
 OUTPUT_DIR = "output_files"
@@ -27,26 +26,30 @@ def image_to_excel(image_file_name, output_columns=None, output_dir=OUTPUT_DIR):
         key: value for key, value in [line.split(":") for line in osd.split("\n")[:-1]]
     }
     rotation_angle = float(osd_dict["Rotate"])
-    pdf_image = tempfile.NamedTemporaryFile(delete=False)
-    with open(pdf_image.name, "wb") as f:
+    pdf_image = os.path.join(OUTPUT_DIR, "image.pdf")
+    with open(pdf_image, "wb") as f:
         f.write(pdf_bytes)
-    print("Pre processing...")
-    with open(pdf_image.name, "rb") as f:
-        pdf = pypdf.PdfReader(f)
+
+    with open(pdf_image, "rb") as f:
         if rotation_angle != 0.0:
-            rotated_pdf_image = tempfile.NamedTemporaryFile(delete=False)
+            print("Pre processing...")
+            pdf = pypdf.PdfReader(f)
             for page in pdf.pages:
                 page.rotate(rotation_angle)
-                with open(rotated_pdf_image.name, "wb") as rotated_f:
-                    pdf_writer = pypdf.PdfWriter()
-                    for page in pdf.pages:
-                        pdf_writer.add_page(page)
-                    pdf_writer.write(rotated_f)
-        print("Reading tables...")
-        try:
-            tables = tabula.read_pdf(rotated_f, pages="all", lattice=True)
-        except:
-            tables = tabula.read_pdf(f, pages="all", lattice=True)
+            rotated_pdf_image = os.path.join(OUTPUT_DIR, "rotated_image.pdf")
+            with open(rotated_pdf_image, "wb") as rotated_f:
+                pdf_writer = pypdf.PdfWriter()
+                for page in pdf.pages:
+                    pdf_writer.add_page(page)
+                pdf_writer.write(rotated_f)
+            with open(rotated_pdf_image, "rb") as rotated_f:
+                print("Reading tables...")
+                tables = tabula.read_pdf(rotated_f, pages="all")
+        else:
+            print("Reading tables...")
+            tables = tabula.read_pdf(f, pages="all")
+    os.remove(pdf_image)
+    os.remove(rotated_pdf_image)
     if not tables:
         print(f"No tables found in {image_file_name}.")
     else:
