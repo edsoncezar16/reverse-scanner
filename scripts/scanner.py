@@ -4,16 +4,11 @@ import pytesseract
 import os
 import tabula
 import pypdf
+import re
 
-INPUT_DIR = "input_images"
-OUTPUT_DIR = "output_files"
-OUTPUT_COLUMNS = [
-    "N2 ROMANEIO / NF",
-    "QTD. DE VOLUMES",
-    "DESTINO",
-    "CLIENTE",
-    "NECOLETA",
-]
+INPUT_DIR = os.environ.get("INPUT_DIR")
+OUTPUT_DIR = os.environ.get("OUTPUT_DIR")
+OUTPUT_COLUMNS = re.findall(r"'(.*?)'", os.environ.get("OUTPUT_COLUMNS"))
 
 
 def image_to_excel(image_file_name, output_columns=None, output_dir=OUTPUT_DIR):

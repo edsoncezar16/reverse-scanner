@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  scanner:
+    build: .
+    restart: always
+    volumes:
+      - ./input_images:/reverse-scanner/input_images
+      - ./output_files:/reverse-scanner/output_files
+    container_name: scanner
+    stdin_open: true
+    tty: true
