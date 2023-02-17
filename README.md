@@ -6,9 +6,11 @@ A program that scans physical files with tables and generates an excel file with
 
 At the time of this writing, I had a girlfriend that worked as the focal of a reverse logistics operation.
 
-Sometimes she would spend many hours at home doing some tasks, such as manually inserting data from physical files with tables into excel files.
+Sometimes she would spend many hours at home doing some tasks, such as typesetting data from physical files with tables into excel files.
 
-This situation originated the idea of developing a program that automates such tasks so that she could spend more time with her children and me.
+This situation originated the idea of developing a program that automates such tasks so that she could be more productive at her work by spending more time on tasks that have a higher priority and actually need her human input.
+
+As a nice side effect, this project enables us to spend more time together at home. <3
 
 ## How to run the application
 
@@ -55,6 +57,8 @@ After you are done playing with the scanner, run
 to remove the containers.
 
 ## Perspectives
+
+- Store extracted data into a PostgreSQL database, at least for specific demands.
 
 - Improve app efficiency with more generic images, not only cropped ones.
 
